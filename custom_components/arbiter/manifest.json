@@ -1,0 +1,14 @@
+{
+  "domain": "arbiter",
+  "name": "Arbiter",
+  "codeowners": [
+    "@scottjones4k"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/scottjones4k/ha-arbiter",
+  "integration_type": "hub",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/scottjones4k/ha-arbiter/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

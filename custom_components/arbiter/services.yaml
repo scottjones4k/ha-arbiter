@@ -1,0 +1,42 @@
+send_pulse:
+  name: Send pulse
+  description: Send a pulse to Arbiter.
+  fields:
+    capability:
+      name: Capability
+      description: Arbiter capability name.
+      required: true
+      example: security.lock_changed
+      selector:
+        text:
+    subject:
+      name: Subject
+      description: Arbiter subject.
+      required: true
+      example: front_door
+      selector:
+        text:
+    severity:
+      name: Severity
+      description: Optional severity override.
+      required: false
+      selector:
+        select:
+          options:
+            - debug
+            - info
+            - warning
+            - critical
+    facts:
+      name: Facts
+      description: Arbitrary facts to include in the pulse.
+      required: false
+      default: {}
+      selector:
+        object:
+    presentation:
+      name: Presentation
+      description: Optional Arbiter presentation object.
+      required: false
+      selector:
+        object:

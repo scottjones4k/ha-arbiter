@@ -1,0 +1,54 @@
+{
+  "title": "Arbiter",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Arbiter",
+        "description": "Configure the Arbiter HTTP endpoint.",
+        "data": {
+          "url": "Arbiter URL",
+          "token": "Bearer token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to Arbiter.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This Arbiter endpoint is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Arbiter options",
+        "menu_options": {
+          "add_observed_entity": "Add observed entity",
+          "remove_observed_entity": "Remove observed entity"
+        }
+      },
+      "add_observed_entity": {
+        "title": "Add observed entity",
+        "description": "Send an Arbiter pulse whenever this Home Assistant entity changes state.",
+        "data": {
+          "entity_id": "Entity",
+          "capability": "Capability",
+          "subject": "Subject",
+          "severity": "Severity",
+          "map_on": "Map HA state 'on' to",
+          "map_off": "Map HA state 'off' to"
+        }
+      },
+      "remove_observed_entity": {
+        "title": "Remove observed entity",
+        "data": {
+          "rule": "Rule"
+        }
+      }
+    },
+    "error": {
+      "required": "Required"
+    }
+  }
+}

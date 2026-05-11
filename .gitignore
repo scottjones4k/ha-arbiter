@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+.pytest_cache/
+.tox/
+.nox/
+.mypy_cache/
+.pyre/
+.ruff_cache/
+htmlcov/
+
+# Type checkers / notebooks
+.dmypy.json
+dmypy.json
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Home Assistant local config/runtime (if present in repo root)
+.homeassistant/
+config/
+.storage/
+*.db
+*.log
+
+# Secrets and local overrides
+secrets.yaml
+secrets*.yaml
+*.local
+.env
+.env.*
+
+# Home Assistant integration development artifacts
+custom_components/*/translations/*.bak
+custom_components/*/__pycache__/
