@@ -18,6 +18,11 @@ from .client import ArbiterClient, ArbiterClientError
 from .const import (
     CONF_CAPABILITY,
     CONF_ENTITY_ID,
+    CONF_HEALTH_ENTITY_ID,
+    CONF_HEALTH_MAP_OFF,
+    CONF_HEALTH_MAP_ON,
+    CONF_HEALTH_MAP_UNAVAILABLE,
+    CONF_HEALTH_MAP_UNKNOWN,
     CONF_MAP_OFF,
     CONF_MAP_ON,
     CONF_OBSERVED_ENTITIES,
@@ -25,6 +30,7 @@ from .const import (
     CONF_SUBJECT,
     DEFAULT_SOURCE,
     DOMAIN,
+    HEALTH_CAPABILITY,
     SERVICE_SEND_PULSE,
 )
 
@@ -141,7 +147,6 @@ def _register_observers(
             if new_state is None:
                 return
 
-            # Avoid sending noisy duplicate state_changed events where the state didn't change.
             if old_state is not None and old_state.state == new_state.state:
                 return
 
@@ -158,6 +163,37 @@ def _register_observers(
             hass,
             [entity_id],
             _state_changed,
+        )
+        data["unsubscribers"].append(unsubscribe)
+
+        health_entity_id = rule.get(CONF_HEALTH_ENTITY_ID)
+        if not health_entity_id:
+            continue
+
+        @callback
+        def _health_state_changed(event, rule=rule):
+            old_state = event.data.get("old_state")
+            new_state = event.data.get("new_state")
+
+            if new_state is None:
+                return
+
+            if old_state is not None and old_state.state == new_state.state:
+                return
+
+            hass.async_create_task(
+                _async_emit_health_state(
+                    client=client,
+                    rule=rule,
+                    old_state=old_state,
+                    new_state=new_state,
+                )
+            )
+
+        unsubscribe = async_track_state_change_event(
+            hass,
+            [health_entity_id],
+            _health_state_changed,
         )
         data["unsubscribers"].append(unsubscribe)
 
@@ -236,3 +272,74 @@ def _build_pulse_payload(
 
 class ArbiterServiceError(HomeAssistantError):
     """Raised when the Arbiter service cannot be used."""
+
+async def _async_emit_health_state(
+    client: ArbiterClient,
+    rule: dict[str, Any],
+    old_state,
+    new_state,
+) -> None:
+    """Emit a health pulse for a linked health/status entity."""
+    raw_state = new_state.state
+    mapped_state = _map_health_state(raw_state, rule)
+
+    facts = {
+        "state": mapped_state,
+        "raw_state": raw_state,
+        "old_raw_state": old_state.state if old_state is not None else None,
+        "entity_id": new_state.entity_id,
+        "friendly_name": new_state.attributes.get(ATTR_FRIENDLY_NAME),
+        "source": DEFAULT_SOURCE,
+
+        # Link this health signal back to the semantic state it affects.
+        "source_entity_id": rule[CONF_ENTITY_ID],
+        "source_capability": rule[CONF_CAPABILITY],
+        "source_subject": rule[CONF_SUBJECT],
+    }
+
+    payload = _build_pulse_payload(
+        capability=HEALTH_CAPABILITY,
+        subject=_health_subject_for_rule(rule),
+        severity=None,
+        facts=facts,
+        presentation=None,
+    )
+
+    try:
+        await client.async_send_pulse(payload)
+    except ArbiterClientError as exc:
+        _LOGGER.warning("Failed to send health pulse to Arbiter: %s", exc)
+
+def _map_health_state(raw_state: str, rule: dict[str, Any]) -> str:
+    """Map HA health entity state to Arbiter health state."""
+    if raw_state == "on" and rule.get(CONF_HEALTH_MAP_ON):
+        return rule[CONF_HEALTH_MAP_ON]
+
+    if raw_state == "off" and rule.get(CONF_HEALTH_MAP_OFF):
+        return rule[CONF_HEALTH_MAP_OFF]
+
+    if raw_state == "unknown" and rule.get(CONF_HEALTH_MAP_UNKNOWN):
+        return rule[CONF_HEALTH_MAP_UNKNOWN]
+
+    if raw_state == "unavailable" and rule.get(CONF_HEALTH_MAP_UNAVAILABLE):
+        return rule[CONF_HEALTH_MAP_UNAVAILABLE]
+
+    return raw_state
+
+
+def _health_subject_for_rule(rule: dict[str, Any]) -> str:
+    """Build a stable subject for the linked health state."""
+    subject = rule[CONF_SUBJECT]
+
+    if subject.endswith("_lock") or subject.endswith("_sensor"):
+        return subject
+
+    capability = rule.get(CONF_CAPABILITY, "")
+
+    if capability == "security.lock_changed":
+        return f"{subject}_lock"
+
+    if capability == "security.entry_open":
+        return f"{subject}_sensor"
+
+    return f"{subject}_device"
