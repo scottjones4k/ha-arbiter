@@ -25,6 +25,7 @@
         "title": "Arbiter options",
         "menu_options": {
           "add_observed_entity": "Add observed entity",
+          "edit_observed_entity": "Edit observed entity",
           "remove_observed_entity": "Remove observed entity"
         }
       },
@@ -37,13 +38,41 @@
           "subject": "Subject",
           "severity": "Severity",
           "map_on": "Map HA state 'on' to",
-          "map_off": "Map HA state 'off' to"
+          "map_off": "Map HA state 'off' to",
+          "health_entity_id": "Health entity",
+          "health_map_on": "Health map 'on'",
+          "health_map_off": "Health map 'off'",
+          "health_map_unknown": "Health map 'unknown'",
+          "health_map_unavailable": "Health map 'unavailable'"
+        }
+      },
+      "edit_observed_entity": {
+        "title": "Edit observed entity",
+        "data": {
+          "rule": "Observed entity"
+        }
+      },
+      "edit_observed_entity_details": {
+        "title": "Edit observed entity",
+        "data": {
+          "entity_id": "Entity",
+          "capability": "Capability",
+          "subject": "Subject",
+          "severity": "Severity",
+          "map_on": "Map 'on' state",
+          "map_off": "Map 'off' state",
+
+          "health_entity_id": "Health entity",
+          "health_map_on": "Health map 'on'",
+          "health_map_off": "Health map 'off'",
+          "health_map_unknown": "Health map 'unknown'",
+          "health_map_unavailable": "Health map 'unavailable'"
         }
       },
       "remove_observed_entity": {
         "title": "Remove observed entity",
         "data": {
-          "rule": "Rule"
+          "rule": "Observed entity"
         }
       }
     },
