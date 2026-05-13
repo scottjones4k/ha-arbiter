@@ -181,6 +181,9 @@ async def _async_emit_observed_state(
         "source": DEFAULT_SOURCE,
     }
 
+    if "person." in new_state.entity_id:
+        facts["person"] = new_state.entity_id.replace("person.", "")
+
     payload = _build_pulse_payload(
         capability=rule[CONF_CAPABILITY],
         subject=rule[CONF_SUBJECT],
