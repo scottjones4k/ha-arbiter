@@ -285,6 +285,7 @@ async def _async_emit_health_state(
 
     facts = {
         "state": mapped_state,
+        "available": mapped_state,
         "raw_state": raw_state,
         "old_raw_state": old_state.state if old_state is not None else None,
         "entity_id": new_state.entity_id,
