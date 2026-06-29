@@ -27,11 +27,9 @@ class ArbiterClient:
             json=payload,
             headers=headers,
         ) as response:
-            if response.status >= 400:
+            if response.status < 200 or response.status >= 300:
                 body = await response.text()
-                raise ArbiterClientError(
-                    f"Arbiter returned HTTP {response.status}: {body[:500]}"
-                )
+                raise ArbiterClientError(f"Arbiter returned HTTP {response.status}: {body}")
 
     async def async_test_connection(self) -> None:
         """Best-effort connection test.
